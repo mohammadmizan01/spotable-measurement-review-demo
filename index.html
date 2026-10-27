@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Spotable Demo — Measurement Review &amp; Quote Readiness (Illustrative)</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Georgia,'Times New Roman',serif;background:#faf6f1;color:#26221d}
+header{background:#fff;border-bottom:4px solid #c2571b;padding:22px 28px}
+header h1{margin:0;font-size:26px;letter-spacing:.2px}
+header p{margin:6px 0 0;color:#6b6259;font-family:Arial,Helvetica,sans-serif;font-size:14px}
+.hint{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6259;padding:12px 28px 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:18px 28px 0}
+.stat{background:#fff;border:1px solid #e6ddd2;border-top:4px solid #c2571b;border-radius:10px;padding:14px}
+.stat b{display:block;font-size:26px;color:#c2571b;font-family:Arial,Helvetica,sans-serif}
+.stat span{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6259}
+.ready{margin:18px 28px 0;background:#fdf0e6;border:1px solid #f0c9a8;border-radius:10px;padding:14px 16px;font-family:Arial,Helvetica,sans-serif;font-size:14px}
+.bar{height:10px;background:#eee2d5;border-radius:6px;margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;background:#c2571b}
+.warn{color:#9a3412;font-weight:bold}
+.layout{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;padding:20px 28px 28px;align-items:start}
+.panel{background:#fff;border:1px solid #e6ddd2;border-radius:12px;padding:16px}
+.panel h2{margin:0 0 12px;font-size:19px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.toolbar input,.toolbar select{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:8px;border:1px solid #d8cec0;border-radius:8px;background:#fff}
+.toolbar input{flex:1;min-width:180px}
+.toolbar label{font-family:Arial,Helvetica,sans-serif;font-size:13px;display:flex;align-items:center;gap:6px}
+.job{border:1px solid #e6ddd2;border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer;background:#fff}
+.job:hover{border-color:#c2571b}
+.job.sel{border:2px solid #c2571b;background:#fff8f2}
+.job h3{margin:0 0 4px;font-size:16px}
+.job p{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6259}
+.badge{display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:12px;padding:2px 8px;border-radius:20px;margin-right:6px}
+.flag{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.low{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.med{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.high{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.st-pending{background:#f5f5f4;color:#57534e;border:1px solid #e7e5e4}
+.st-validated{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.st-approved{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.st-rejected{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.detail h2{margin:0 0 4px;font-size:21px}
+.detail .meta{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6259;margin-bottom:12px}
+.struct{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.struct button{font-family:Arial,Helvetica,sans-serif;font-size:13px;padding:7px 12px;border-radius:20px;border:1px solid #d8cec0;background:#fff;cursor:pointer}
+.struct button.on{background:#c2571b;color:#fff;border-color:#c2571b}
+.surf{width:100%;border-collapse:collapse;font-family:Arial,Helvetica,sans-serif;font-size:14px;margin:10px 0}
+.surf th{text-align:left;border-bottom:2px solid #e6ddd2;padding:6px}
+.surf td{border-bottom:1px solid #f0e8dd;padding:6px}
+.surf input{width:90px;padding:6px;border:1px solid #d8cec0;border-radius:6px;font-size:14px}
+.flagbox{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px;font-family:Arial,Helvetica,sans-serif;font-size:14px;margin:12px 0}
+.flagbox b{color:#b91c1c}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+button.act{font-family:Arial,Helvetica,sans-serif;font-size:14px;padding:9px 14px;border-radius:8px;cursor:pointer;border:1px solid #c2571b}
+button.primary{background:#c2571b;color:#fff}
+button.ghost{background:#fff;color:#c2571b}
+button:disabled{opacity:.45;cursor:not-allowed}
+.err{color:#b91c1c;font-family:Arial,Helvetica,sans-serif;font-size:13px;margin-top:8px}
+.total{font-size:20px;margin:12px 0;font-family:Arial,Helvetica,sans-serif}
+.total b{color:#c2571b}
+footer{padding:0 28px 28px;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#6b6259}
+#loading{padding:40px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b6259}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<header>
+<h1>Spotable Demo — Measurement Review &amp; Quote Readiness (Illustrative)</h1>
+<p>AI-generated roof &amp; facade measurements waiting for a human check — before the quote goes out for signing.</p>
+</header>
+<p class="hint">Click a job card to review it. Pick a structure to change what is quoted. Resolve every flag before approving.</p>
+<div id="loading">Loading measurement jobs…</div>
+<div id="app" style="display:none">
+<div class="stats" id="stats"></div>
+<div class="ready" id="ready"></div>
+<div class="layout">
+<section class="panel">
+<h2>Measurement jobs</h2>
+<div class="toolbar">
+<input id="q" type="search" placeholder="Search address or job type" oninput="setQuery(this.value)">
+<select id="st" onchange="setStatus(this.value)">
+<option>All statuses</option><option>Pending</option><option>Validated</option><option>Approved</option><option>Rejected</option>
+</select>
+<label><input type="checkbox" id="fo" onchange="setFlagged(this.checked)"> Flagged only</label>
+</div>
+<div id="jobList"></div>
+<div id="empty" style="display:none;font-family:Arial,Helvetica,sans-serif;color:#6b6259">No jobs match these filters.</div>
+</section>
+<aside class="panel detail" id="detail"></aside>
+</div>
+</div>
+<footer>
+Demo data only — no real addresses, aerial imagery, 3D models, material prices or customer data are processed. No integration with Spotable. This is an illustrative review workflow, not Spotable's product.
+</footer>
+<script>
+const JOBS=[
+{id:'J-01',address:'Villa Lindenlaan 12, Ghent',type:'Pitched roof',scope:'Full roof',rate:45,status:'pending',flag:null,structures:[{name:'Main house',surfaces:[{label:'Front slope',area:208,conf:'High'},{label:'Rear slope',area:204,conf:'High'}]}]},
+{id:'J-02',address:'Riverside Apartments, Block A',type:'Flat roof + terrace',scope:'Full roof',rate:48,status:'pending',flag:'Low confidence: valley lengths uncertain — shadow in the aerial image. Verify against a second capture before pricing is locked.',structures:[{name:'Block A',surfaces:[{label:'Flat roof',area:640,conf:'High'},{label:'Terrace',area:220,conf:'Low'}]}]},
+{id:'J-03',address:'Corner Retail, Shop + Warehouse',type:'Pitched + flat roof',scope:'Full roof',rate:44,status:'pending',flag:null,structures:[{name:'Shop',surfaces:[{label:'Pitched roof',area:380,conf:'High'}]},{name:'Warehouse',surfaces:[{label:'Flat roof',area:260,conf:'Medium'}]}]},
+{id:'J-04',address:'Villa Beukenhof 8',type:'Pitched roof',scope:'Full roof',rate:43,status:'pending',flag:'Two structures detected at this address — confirm the selected building before the quote goes out.',structures:[{name:'Main house',surfaces:[{label:'Front slope',area:190,conf:'High'},{label:'Rear slope',area:198,conf:'High'}]},{name:'Garage',surfaces:[{label:'Flat roof',area:96,conf:'Medium'}]}]},
+{id:'J-05',address:'Row House, Station Street 44',type:'Pitched roof',scope:'One roof section only',rate:44,status:'pending',flag:null,structures:[{name:'Main house',surfaces:[{label:'Front section',area:210,conf:'High'}]}]},
+{id:'J-06',address:'Farmhouse, Meadow Lane 3',type:'Large pitched roof',scope:'Full roof',rate:44,status:'pending',flag:'Surface mismatch: AI total 720 m² vs site note 665 m² — reconcile before pricing.',structures:[{name:'Farmhouse',surfaces:[{label:'Main slope',area:380,conf:'Medium'},{label:'Rear slope',area:340,conf:'Low'}]}]},
+{id:'J-07',address:'Office, Harbor Road 21',type:'Facade',scope:'2 of 4 facade sides',rate:41,status:'pending',flag:null,structures:[{name:'Office block',surfaces:[{label:'North facade',area:280,conf:'High'},{label:'East facade',area:260,conf:'High'}]}]},
+{id:'J-08',address:'Villa Duinweg 9',type:'Pitched roof + dormers',scope:'Full roof',rate:43,status:'pending',flag:'Scope gap: one facade side is excluded from this measurement — confirm scope before the quote is sent.',structures:[{name:'Main house',surfaces:[{label:'Roof',area:300,conf:'High'},{label:'Dormers',area:155,conf:'Medium'}]}]},
+{id:'J-09',address:'School Annex, Park Avenue 5',type:'Flat roof',scope:'Full roof',rate:43,status:'pending',flag:null,structures:[{name:'Annex',surfaces:[{label:'Flat roof',area:1120,conf:'High'}]}]},
+{id:'J-10',address:'Cottage, Forest Edge 2',type:'Small pitched roof',scope:'Full roof',rate:44,status:'pending',flag:null,structures:[{name:'Cottage',surfaces:[{label:'Front slope',area:95,conf:'Medium'},{label:'Rear slope',area:90,conf:'Medium'}]}]}
+];
+let selectedId='J-01', selStruct={}, query='', statusFilter='All statuses', flaggedOnly=false;
+JOBS.forEach(j=>{selStruct[j.id]=0;});
+const money=n=>'€'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const jobArea=j=>j.structures[selStruct[j.id]].surfaces.reduce((s,x)=>s+x.area,0);
+const jobTotal=j=>jobArea(j)*j.rate;
+const jobConf=j=>{const cs=j.structures[selStruct[j.id]].surfaces.map(s=>s.conf); if(cs.includes('Low'))return 'Low'; if(cs.includes('Medium'))return 'Medium'; return 'High';};
+const confCls=c=>c==='Low'?'low':(c==='Medium'?'med':'high');
+const stCls=s=>'st-'+s.toLowerCase();
+function filtered(){return JOBS.filter(j=>{
+if(statusFilter!=='All statuses' && j.status!==statusFilter.toLowerCase())return false;
+if(flaggedOnly && !j.flag)return false;
+if(query && !(j.address+' '+j.type).toLowerCase().includes(query.toLowerCase()))return false;
+return true;});}
+function renderStats(){
+const open=JOBS.filter(j=>j.flag && j.status!=='rejected').length;
+const val=JOBS.filter(j=>j.status!=='rejected').reduce((s,j)=>s+jobTotal(j),0);
+const appr=JOBS.filter(j=>j.status==='approved').length;
+document.getElementById('stats').innerHTML=
+'<div class="stat"><b>'+JOBS.length+'</b><span>Measurement jobs</span></div>'+
+'<div class="stat"><b>'+open+'</b><span>Flagged for review</span></div>'+
+'<div class="stat"><b>'+money(val)+'</b><span>Quote value (open jobs)</span></div>'+
+'<div class="stat"><b>'+appr+'</b><span>Approved for signing</span></div>';
+const pct=Math.round(appr/JOBS.length*100);
+document.getElementById('ready').innerHTML=
+'<b>Quote readiness:</b> '+appr+' of '+JOBS.length+' jobs approved · '+open+' flagged still open'+
+(open>0?'<div class="warn">Resolve flagged jobs before sending quotes for digital signing.</div>':'<div>All flags resolved — quotes are ready to send.</div>')+
+'<div class="bar"><i style="width:'+pct+'%"></i></div>';
+}
+function renderList(){
+const list=filtered();
+document.getElementById('empty').style.display=list.length?'none':'block';
+document.getElementById('jobList').innerHTML=list.map(j=>{
+const c=jobConf(j);
+return '<div class="job '+(j.id===selectedId?'sel':'')+'" onclick="selectJob(\''+j.id+'\')">'+
+'<h3>'+j.id+' — '+j.address+'</h3>'+
+'<p>'+j.type+' · '+j.scope+' · '+jobArea(j).toLocaleString('en-US')+' m² · '+money(jobTotal(j))+'</p>'+
+'<p style="margin-top:6px"><span class="badge '+confCls(c)+'">'+c+' confidence</span>'+
+(j.flag?'<span class="badge flag">Flagged</span>':'<span class="badge ok">No flag</span>')+
+'<span class="badge '+stCls(j.status)+'">'+j.status+'</span></p></div>';}).join('');
+}
+function renderDetail(){
+const j=JOBS.find(x=>x.id===selectedId);
+const st=j.structures[selStruct[j.id]];
+let rows=st.surfaces.map((s,i)=>'<tr><td>'+s.label+'</td><td><span class="badge '+confCls(s.conf)+'">'+s.conf+'</span></td><td><input id="ar-'+i+'" type="number" min="1" step="1" value="'+s.area+'"> m²</td><td>'+money(s.area*j.rate)+'</td></tr>').join('');
+document.getElementById('detail').innerHTML=
+'<h2>'+j.id+' — '+j.address+'</h2>'+
+'<div class="meta">'+j.type+' · Scope: '+j.scope+' · Rate '+money(j.rate)+' per m²</div>'+
+'<div><b>Select structure to quote:</b></div>'+
+'<div class="struct">'+j.structures.map((s,i)=>'<button class="'+(i===selStruct[j.id]?'on':'')+'" onclick="pickStruct('+i+')">'+s.name+'</button>').join('')+'</div>'+
+'<table class="surf"><tr><th>Surface</th><th>Confidence</th><th>Area</th><th>Value</th></tr>'+rows+'</table>'+
+'<div class="total">Job total: <b>'+money(jobTotal(j))+'</b> ('+jobArea(j).toLocaleString('en-US')+' m²)</div>'+
+(j.flag?'<div class="flagbox"><b>Flag — needs review:</b> '+j.flag+'</div>':'<div class="flagbox" style="background:#f0fdf4;border-color:#bbf7d0"><b style="color:#15803d">No open flag</b> — surfaces validated for this job.</div>')+
+'<div class="actions">'+
+'<button class="act primary" onclick="applyAreas()">Apply area changes</button>'+
+'<button class="act ghost" onclick="markValidated()">Mark validated</button>'+
+'<button class="act primary" '+(j.flag?'disabled':'')+' onclick="approve()">Approve for quote</button>'+
+'<button class="act ghost" onclick="reject()">Reject measurement</button>'+
+'<button class="act ghost" onclick="download()">Download bill of measurement</button>'+
+'</div>'+
+(j.flag?'<div class="err">Approve is disabled while a flag is open — resolve the flag first.</div>':'')+
+'<div class="err" id="derr"></div>';
+}
+function render(){renderStats();renderList();renderDetail();}
+function selectJob(id){selectedId=id;render();}
+function pickStruct(i){selStruct[selectedId]=i;render();}
+function setQuery(v){query=v;renderList();}
+function setStatus(v){statusFilter=v;renderList();}
+function setFlagged(v){flaggedOnly=v;renderList();}
+function cur(){return JOBS.find(x=>x.id===selectedId);}
+function applyAreas(){
+const j=cur(), st=j.structures[selStruct[j.id]];
+for(let i=0;i<st.surfaces.length;i++){const v=Number(document.getElementById('ar-'+i).value); if(!(v>0)){document.getElementById('derr').textContent='Area must be greater than 0 m².'; return;}}
+for(let i=0;i<st.surfaces.length;i++){st.surfaces[i].area=Number(document.getElementById('ar-'+i).value);}
+render();
+}
+function markValidated(){const j=cur(); if(j.status!=='rejected')j.status='validated'; render();}
+function approve(){const j=cur(); if(j.flag)return; j.status='approved'; render();}
+function reject(){cur().status='rejected'; render();}
+function resolveFlag(){const j=cur(); j.flag=null; render();}
+function download(){
+const j=cur(), st=j.structures[selStruct[j.id]];
+let t='BILL OF MEASUREMENT (DEMO DATA ONLY)\nJob: '+j.id+' — '+j.address+'\nType: '+j.type+' · Scope: '+j.scope+'\nStructure: '+st.name+'\n\n';
+st.surfaces.forEach(s=>{t+=s.label+': '+s.area+' m² ('+s.conf+' confidence) — '+money(s.area*j.rate)+'\n';});
+t+='\nTotal area: '+jobArea(j).toLocaleString('en-US')+' m²\nTotal value: '+money(jobTotal(j))+'\nFlag: '+(j.flag?j.flag:'none')+'\nStatus: '+j.status+'\n\nDemo data only — no real addresses, imagery or pricing. Not Spotable\'s product.';
+const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'})); a.download='spotable-bill-of-measurement-'+j.id+'.txt'; a.click(); URL.revokeObjectURL(a.href);
+}
+const _origRenderDetail=renderDetail;
+renderDetail=function(){
+_origRenderDetail();
+const j=cur();
+if(j.flag){
+const box=document.querySelector('#detail .flagbox');
+if(box){const b=document.createElement('button'); b.className='act ghost'; b.textContent='Resolve flag'; b.style.marginTop='8px'; b.onclick=resolveFlag; box.appendChild(document.createElement('br')); box.appendChild(b);}
+}
+};
+window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('loading').style.display='none'; document.getElementById('app').style.display='block'; render();},900);});
+</script>
+</body>
+</html>
